@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Penny Pouch 🐷 | cute expense tracker</title>
+  <meta name="description" content="A cute doodle expense tracker with budgets, charts, history and PDF export.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐷</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- floating background doodles -->
+  <div class="doodles" aria-hidden="true">
+    <span style="top:6%;left:5%;--d:0s">✦</span>
+    <span style="top:14%;right:7%;--d:1s">♡</span>
+    <span style="top:32%;left:2%;--d:2s">☁</span>
+    <span style="top:48%;right:3%;--d:.5s">✿</span>
+    <span style="top:64%;left:4%;--d:1.5s">★</span>
+    <span style="top:78%;right:6%;--d:2.5s">☾</span>
+    <span style="top:90%;left:8%;--d:.8s">♡</span>
+    <span style="top:24%;right:22%;--d:1.2s">✧</span>
+    <span style="top:56%;left:18%;--d:2.2s">✧</span>
+  </div>
+
+  <main class="wrap">
+
+    <!-- HEADER -->
+    <header class="top">
+      <div class="brand">
+        <span class="brand-pig">🐷</span>
+        <div>
+          <h1>Penny Pouch</h1>
+          <p class="tag">a tiny diary for your pocket money ✿</p>
+        </div>
+      </div>
+      <button id="greet" class="chip-btn" title="Change name"></button>
+    </header>
+
+    <!-- MONTH SWITCHER -->
+    <nav class="monthbar" aria-label="Choose month">
+      <button id="prevMonth" class="round" aria-label="Previous month">‹</button>
+      <div class="month-center">
+        <h2 id="monthLabel">October 2026</h2>
+        <button id="thisMonth" class="link" type="button">jump to today</button>
+      </div>
+      <button id="nextMonth" class="round" aria-label="Next month">›</button>
+    </nav>
+
+    <!-- HERO SUMMARY -->
+    <section id="summary" class="card hero">
+      <div class="hero-main">
+        <p class="label">spent this month</p>
+        <div class="big" id="totalSpent">0</div>
+        <p id="budgetLine" class="budget-line"></p>
+        <div class="bar" role="progressbar" aria-label="Budget used"><div id="heroBar" class="fill"></div></div>
+        <p id="mood" class="mood"></p>
+        <button id="openBudget" class="btn peach" type="button">🎯 Set / change budget</button>
+      </div>
+      <div class="hero-pig" aria-hidden="true">
+        <div class="pig">🐷</div>
+        <div class="bubble" id="pigFace">😊</div>
+      </div>
+    </section>
+
+    <section id="stats" class="stats"></section>
+
+    <!-- ADD EXPENSE -->
+    <section id="add" class="card">
+      <h2>➕ Add a spending</h2>
+      <form id="expForm" autocomplete="off">
+        <div class="grid2">
+          <label>📅 Date
+            <input type="date" id="date" required>
+          </label>
+          <label>💸 How much?
+            <div class="money-input"><span class="cur">₹</span>
+              <input type="number" id="amount" inputmode="decimal" min="0" step="0.01" placeholder="0" required>
+            </div>
+          </label>
+        </div>
+        <label>🏷️ Category
+          <div class="row">
+            <select id="cat"></select>
+            <button type="button" id="addCat" class="btn mini lilac" title="Add your own category">＋ new</button>
+          </div>
+        </label>
+        <label>📝 What was it? <small>(optional)</small>
+          <input type="text" id="item" maxlength="80" placeholder="e.g. momos with besties">
+        </label>
+        <div class="actions">
+          <button class="btn mint" id="saveBtn" type="submit">Save it 💕</button>
+          <button type="button" id="cancelEdit" class="btn ghost" hidden>Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- BUDGET PLAN -->
+    <section id="plan" class="card">
+      <h2>🗓️ Budget plan</h2>
+      <p class="sub" id="planSub"></p>
+      <div id="planList"></div>
+    </section>
+
+    <!-- CHARTS -->
+    <section class="charts">
+      <div class="card">
+        <h2>🍩 Where it went</h2>
+        <div id="catEmpty" class="empty" hidden>Nothing to chart yet 🌱<br><small>add a spending and a pretty donut will appear!</small></div>
+        <div class="chart-box donut"><canvas id="catChart"></canvas></div>
+        <ul id="catLegend" class="legend"></ul>
+      </div>
+      <div class="card">
+        <h2>📊 Day by day</h2>
+        <div class="chart-box bars"><canvas id="dayChart"></canvas></div>
+        <p class="sub small">daily spending across the month</p>
+      </div>
+    </section>
+
+    <!-- EXPENSE LIST -->
+    <section id="list" class="card">
+      <div class="list-head">
+        <h2>🧾 This month's list</h2>
+        <select id="filterCat" aria-label="Filter by category"></select>
+      </div>
+      <div id="expList" class="exp-list"></div>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="history" class="card">
+      <div class="list-head">
+        <h2>📚 History</h2>
+        <select id="histYear" aria-label="Choose year"></select>
+      </div>
+      <div id="yearStats" class="year-stats"></div>
+      <div class="chart-box hist"><canvas id="histChart"></canvas></div>
+      <div id="monthRows" class="month-rows"></div>
+      <h3>🌈 All years</h3>
+      <div id="yearChips" class="chips"></div>
+    </section>
+
+    <!-- TOOLS -->
+    <section id="tools" class="card">
+      <h2>🎀 Goodies</h2>
+      <div class="tool">
+        <div>
+          <strong>Download as PDF</strong>
+          <p class="sub small">date · category · amount · item</p>
+        </div>
+        <div class="row">
+          <select id="pdfScope" aria-label="What to download">
+            <option value="month">This month</option>
+            <option value="year">This year (history)</option>
+            <option value="all">Everything</option>
+          </select>
+          <button id="pdfBtn" class="btn peach" type="button">📄 Download</button>
+        </div>
+      </div>
+      <div class="tool">
+        <div>
+          <strong>Backup &amp; restore</strong>
+          <p class="sub small">Data lives on this device &amp; browser. Save a backup now and then!</p>
+        </div>
+        <div class="row">
+          <button id="exportBtn" class="btn lilac" type="button">💾 Backup</button>
+          <button id="importBtn" class="btn lilac" type="button">📂 Restore</button>
+          <input type="file" id="importFile" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="tool">
+        <div>
+          <strong>Start fresh</strong>
+          <p class="sub small">Deletes everything on this device.</p>
+        </div>
+        <button id="wipeBtn" class="btn ghost" type="button">🧹 Clear all</button>
+      </div>
+    </section>
+
+    <footer class="foot">made with 💕 just for you · every penny counts ✿</footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- DIALOGS -->
+  <dialog id="nameDialog">
+    <form id="nameForm" method="dialog">
+      <div class="dlg-emoji">🌸</div>
+      <h2>Hiii! What should I call you?</h2>
+      <input type="text" id="nameInput" maxlength="24" placeholder="your name, cutie">
+      <div class="actions"><button class="btn mint" type="submit">Let's go ✨</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="dailyDialog">
+    <div class="dlg-emoji">🐷💭</div>
+    <h2 id="dailyTitle">Hey cutie!</h2>
+    <p>Did you spend anything today?</p>
+    <div class="actions stack">
+      <button class="btn mint" id="dailyAdd" type="button">Yes, add it 💸</button>
+      <button class="btn peach" id="dailyNone" type="button">No spending today 🎉</button>
+      <button class="btn ghost" id="dailyLater" type="button">Ask me later</button>
+    </div>
+  </dialog>
+
+  <dialog id="budgetDialog">
+    <form id="budgetForm" method="dialog">
+      <div class="dlg-emoji">🎯</div>
+      <h2 id="budgetTitle">Monthly budget</h2>
+      <label>How much can you spend this month?
+        <div class="money-input"><span class="cur">₹</span>
+          <input type="number" id="budgetInput" inputmode="decimal" min="0" step="1" placeholder="e.g. 5000">
+        </div>
+      </label>
+      <p class="sub small">Split it across categories (in %). Don't worry if it's not exactly 100, I'll balance it.</p>
+      <div id="planInputs" class="plan-inputs"></div>
+      <p id="planTotal" class="sub small"></p>
+      <div class="actions">
+        <button class="btn mint" type="submit">Save budget 💕</button>
+        <button class="btn ghost" id="budgetCancel" type="button">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="catDialog">
+    <form id="catForm" method="dialog">
+      <div class="dlg-emoji">🏷️</div>
+      <h2>New category</h2>
+      <div class="grid2 cat-grid">
+        <label>Emoji
+          <input type="text" id="catEmoji" maxlength="4" placeholder="🧁" required>
+        </label>
+        <label>Name
+          <input type="text" id="catName" maxlength="20" placeholder="Snacks" required>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn mint" type="submit">Add ✨</button>
+        <button class="btn ghost" id="catCancel" type="button">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- libraries (loaded from CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
